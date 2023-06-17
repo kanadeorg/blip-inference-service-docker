@@ -1,0 +1,1 @@
+docker save --output blip-infer.tar blip-infer

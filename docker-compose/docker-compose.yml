@@ -1,0 +1,30 @@
+version: '3.3'
+
+networks:
+  nointernet-blip-infer:
+    internal: true
+  internet-blip-infer: {}
+
+
+services:
+  blip-inference:
+    image: blip-infer
+    restart: unless-stopped
+    runtime: nvidia
+    # shm_size: '50G'
+    networks:
+      - nointernet-blip-infer
+    ports:
+      - 5005:5000
+    environment:
+      - NVIDIA_VISIBLE_DEVICES=0
+  reverse-proxy:
+    restart: unless-stopped
+    image: nginx
+    networks:
+      - nointernet-blip-infer
+      - internet-blip-infer
+    ports:
+      - 5005:80
+    volumes:
+      - ./config/default.conf:/etc/nginx/conf.d/default.conf
